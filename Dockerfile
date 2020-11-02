@@ -41,6 +41,7 @@ RUN wget -O /usr/src/glpi-${GLPI_VERSION}.tgz \
 	https://github.com/glpi-project/glpi/releases/download/${GLPI_VERSION}/glpi-${GLPI_VERSION}.tgz
 
 COPY docker-entrypoint.sh /docker-entrypoint.sh
+COPY patch-glpi-password.awk /
 RUN mkdir /docker-entrypoint-early.d /docker-entrypoint-late.d
 
 WORKDIR /var/www/html

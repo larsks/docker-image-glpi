@@ -4,6 +4,10 @@
 : ${MYSQL_DATABASE:=glpi}
 : ${MYSQL_USER:=glpi}
 
+hash_password() {
+	echo "<?php echo password_hash('$1', PASSWORD_BCRYPT) ?>" | php
+}
+
 set -e
 
 if [ -z "$MYSQL_PASSWORD" ]; then
@@ -22,6 +26,14 @@ find /docker-entrypoint-early.d -name '*.sh' -type f -print0 |
 	xargs -0 -n1 sh
 
 php bin/console glpi:system:check_requirements
+
+if ! [ -z "$GLPI_PASSWORD" ]; then
+	echo "Replacing password for glpi user..."
+	hashed_password=$(hash_password "$GLPI_PASSWORD")
+	awk -v PASSWORD="$hashed_password" -f /patch-glpi-password.awk \
+		install/empty_data.php > install/empty_data.php.new
+	mv install/empty_data.php.new install/empty_data.php
+fi
 
 if ! php bin/console glpi:system:status; then
 	echo "Setting up database (this may take a while)"
