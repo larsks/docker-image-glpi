@@ -12,9 +12,8 @@ if [ -z "$DB_PASS" ]; then
 fi
 
 if [ ! -f /var/www/html/index.php ]; then
-	echo "Copying files into /var/www/html"
-	tar -C /usr/src/glpi -cf- . |
-		tar -C /var/www/html -xf-
+	echo "Extracting GLPI"
+	tar -xf /usr/src/glpi-${GLPI_VERSION}.tgz --strip-components=1
 fi
 
 if ! php bin/console glpi:system:status; then
