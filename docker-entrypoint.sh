@@ -16,6 +16,11 @@ if [ ! -f /var/www/html/index.php ]; then
 	tar -xf /usr/src/glpi-${GLPI_VERSION}.tgz --strip-components=1
 fi
 
+echo "Running early entrypoint scripts..."
+find /docker-entrypoint-early.d -name '*.sh' -type f -print0 |
+	sort -zn |
+	xargs -0 -n1 sh
+
 php bin/console glpi:system:check_requirements
 
 if ! php bin/console glpi:system:status; then
@@ -27,6 +32,10 @@ if ! php bin/console glpi:system:status; then
 		--db-password=${MYSQL_PASSWORD}
 fi
 
-php bin/console db:update
+
+echo "Running late entrypoint scripts..."
+find /docker-entrypoint-late.d -name '*.sh' -type f -print0 |
+	sort -zn |
+	xargs -0 -n1 sh
 
 exec "$@"
