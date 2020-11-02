@@ -56,6 +56,8 @@ if ! php bin/console glpi:system:status; then
 	fi
 fi
 
+rm -f install/install.php
+
 php bin/console db:update -n
 
 echo "Running late entrypoint scripts..."
