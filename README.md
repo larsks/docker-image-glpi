@@ -15,7 +15,7 @@ podman run -d --pod glpipod --name mysql \
 # Start GLPI
 podman run -d --pod glpipod --name glpi \
   -v glpi:/var/www/html \
-  -e DB_PASS=secret \
+  -e MYSQL_PASSWORD=secret \
   larsks/glpi
 
 # Start Nginx

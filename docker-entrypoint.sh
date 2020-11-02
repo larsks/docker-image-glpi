@@ -1,13 +1,13 @@
 #!/bin/sh
 
-: ${DB_HOST:=127.0.0.1}
-: ${DB_NAME:=glpi}
-: ${DB_USER:=glpi}
+: ${MYSQL_HOST:=127.0.0.1}
+: ${MYSQL_DATABASE:=glpi}
+: ${MYSQL_USER:=glpi}
 
 set -e
 
-if [ -z "$DB_PASS" ]; then
-	echo "ERROR: missing DB_PASS" >&2
+if [ -z "$MYSQL_PASSWORD" ]; then
+	echo "ERROR: missing MYSQL_PASSWORD" >&2
 	exit 1
 fi
 
@@ -21,10 +21,10 @@ php bin/console glpi:system:check_requirements
 if ! php bin/console glpi:system:status; then
 	echo "Setting up database (this may take a while)"
 	php bin/console db:install -n \
-		--db-host=${DB_HOST} \
-		--db-name=${DB_NAME} \
-		--db-user=${DB_USER} \
-		--db-password=${DB_PASS}
+		--db-host=${MYSQL_HOST} \
+		--db-name=${MYSQL_DATABASE} \
+		--db-user=${MYSQL_USER} \
+		--db-password=${MYSQL_PASSWORD}
 fi
 
 php bin/console db:update
