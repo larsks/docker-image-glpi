@@ -37,13 +37,26 @@ fi
 
 if ! php bin/console glpi:system:status; then
 	echo "Setting up database (this may take a while)"
-	php bin/console db:install -n \
+	if ! php bin/console db:install -n \
 		--db-host=${MYSQL_HOST} \
 		--db-name=${MYSQL_DATABASE} \
 		--db-user=${MYSQL_USER} \
-		--db-password=${MYSQL_PASSWORD}
+		--db-password=${MYSQL_PASSWORD}; then
+
+		# the db:install command will fail if the database is
+		# already populated. in that cast, just re-run 
+		# glpi:system:status now that we have set database
+		# credentials to check if things are working.
+		if php bin/console glpi:system:status; then
+			echo "Using existing database"
+		else
+			echo "ERROR: failed to initialize database" >&2
+			exit 1
+		fi
+	fi
 fi
 
+php bin/console db:update -n
 
 echo "Running late entrypoint scripts..."
 find /docker-entrypoint-late.d -name '*.sh' -type f -print0 |
